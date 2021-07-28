@@ -1,8 +1,10 @@
-import java.util.Arrays;
+import java.util.List;
 
 public class Chessboard {
     public boolean whiteToMove;
     public Piece[][] board;
+    public List<Piece> black;
+    public List<Piece> white;
     public int winner;
     public static final String[][] INIT_BOARD = {
         {"a2","b2","c2","d2","e2","f2","g2","h2"},
@@ -24,14 +26,15 @@ public class Chessboard {
     public Chessboard() {
         this.whiteToMove = true;
         this.board = makeBoard(INIT_BOARD);
+        //this.white = ;
+        //this.black = ;
         this.winner = -1;
     }
 
     public Move parseMove (String note) {
-        // basic parse move
-        // check validity
         note = note.replaceAll("\\s","");
-        return new Move(note.substring(0, 2), note.substring(2));
+        return null;
+
     }
 
     public void makeMove (Move move) {
@@ -58,14 +61,14 @@ public class Chessboard {
         Piece[][] board = new Piece[8][8];
         for (int i = 0; i < board.length; i ++) {
             for (int j = 0; j < board.length; j++) {
-                board[i][j] = new Piece();
+                board[i][j] = null;
             }
         }
         for (int i = 0; i < state.length; i ++) {
             for (int j = 0; j < state[i].length; j ++) {
                 int row = positionToInt(state[i][j])[0];
                 int col = positionToInt(state[i][j])[1];
-                board[row][col] = new Piece(i % 6, i < 6 ? 0 : 1);
+                board[row][col] = Piece.fromInt(i % 6, i < 6, state[i][j]);
             }
         }
         return board;
@@ -75,7 +78,7 @@ public class Chessboard {
         for (int i = 7; i >= 0; i --) {
             for (int j = 0; j < 8; j ++) {
                 Piece p = board[i][j];
-                System.out.print((p.color == 0 ? p.toChar() : p.toChar().toLowerCase()) + " ");
+                System.out.print((p == null ? "-" : p.toChar()) + " ");
             }
             System.out.println();
         }

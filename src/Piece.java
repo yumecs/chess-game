@@ -1,18 +1,10 @@
-public class Piece {
+public abstract class Piece {
     public int id;
-    public int color;
+    public boolean white;
+    public String position;
     public boolean hasMoved;
 
-    public Piece() {
-        this.id = -1;
-        this.color = -1;
-    }
-    public Piece(int newPiece, int newColor) {
-        this.id = newPiece;
-        this.color = newColor;
-    }
-
-    public static int fromChar(char c) {
+    public static int idFromChar(char c) {
         switch (c) {
             case 'N':
                 return 1;
@@ -30,33 +22,32 @@ public class Piece {
         }
     }
 
-    public String toString() {
-        return idToOutput(this.id, false);
+    public static Piece fromChar(char c, boolean color, String pos) {
+        return fromInt(idFromChar(c), color, pos);
     }
 
-    public String toChar() {
-        return idToOutput(this.id, true);
-    }
-
-    public static String idToOutput(int p, boolean asChar) {
-        switch (p) {
-            case -1:
-                return asChar ? "-" : "Null";
-            case 0:
-                return asChar ? "P" : "Pawn";
-            case 1:
-                return asChar ? "N" : "Knight";
-            case 2:
-                return asChar ? "B" : "Bishop";
-            case 3:
-                return asChar ? "R" : "Rook";
-            case 4:
-                return asChar ? "Q" : "Queen";
-            case 5:
-                return asChar ? "K" : "King";
+    public static Piece fromInt(int i, boolean color, String pos) {
+        switch (i) {
+            case '0':
+                return new Pawn(color, pos);
+            case '1':
+                return new Knight(color, pos);
+            case '2':
+                return new Bishop(color, pos);
+            case '3':
+                return new Rook(color, pos);
+            case '4':
+                return new Queen(color, pos);
+            case '5':
+                return new King(color, pos);
             default:
                 // throw exception
-                return "";
+                return null;
         }
     }
+
+    public abstract String toString();
+
+    public abstract char toChar();
+
 }
