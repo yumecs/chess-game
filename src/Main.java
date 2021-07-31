@@ -9,8 +9,8 @@ public class Main {
             System.out.println("\n\nEnter move");
             String nextMove = myObj.nextLine();
             beatrice.makeMove(beatrice.parseMove(nextMove));
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
+            // System.out.print("\033[H\033[2J");
+            // System.out.flush();
         }
     }
 }

@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Bishop extends Piece {
     public Bishop(boolean isWhite, String newPosition) {
         this.id = 2;
@@ -10,6 +12,14 @@ public class Bishop extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " bishop at: " + position + ".";
+        return (white ? "White" : "Black") + " bishop at: " + position;
+    }
+
+    public int naiveValue(String end) {
+        return -1;
+    }
+
+    public List<int[]> getCollision(String end) {
+        return null;
     }
 }

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Chessboard {
@@ -38,8 +39,8 @@ public class Chessboard {
             List<Piece> pieceList = new ArrayList<>(state[i].length);
             (i < 6 ? white : black).add(pieceList);
             for (int j = 0; j < state[i].length; j++) {
-                int row = positionToInt(state[i][j])[0];
-                int col = positionToInt(state[i][j])[1];
+                int row = positionToInts(state[i][j])[0];
+                int col = positionToInts(state[i][j])[1];
                 Piece newPiece = Piece.fromInt(i % 6, i < 6, state[i][j]);
                 board[row][col] = newPiece;
                 pieceList.add(newPiece);
@@ -52,7 +53,7 @@ public class Chessboard {
         this(INIT_BOARD);
     }
 
-    public Move parseMove (String note) {
+    public String[] parseMove (String note) {
         note = note.replaceAll("\\s","");
         note = note.replaceAll("x","");
         // throw exceptions based on length
@@ -69,34 +70,71 @@ public class Chessboard {
             end = note.substring(inc, inc + 2);
             start = this.inferStart(id, end);
         }
-        return new Move(start, end);
+        return new String[]{start, end};
     }
 
     public String inferStart(int id, String end) {
-        String start = "";
         List<Piece> list = (whiteToMove ? white : black).get(id);
         for (Piece test : list) {
-            start = legalMoveTo(test, end) ? test.position : start;
+            System.out.println("Checking move from " + test);
+            boolean legal = legalMoveTo(test, end);
+            if (legal) {
+                System.out.println("Inferring: " + test.position);
+                return test.position;
+            }
+            System.out.println("Failed. Next candidate.");
         }
         // throw exception if empty string
-        System.out.println("Inferring: " + id + " " + start);
-        return start;
+        System.out.println("Exception: start not found.");
+        return "";
     }
 
     public boolean legalMoveTo(Piece test, String end) {
-        if (collidesWith(test.id, test.position, end)) {
-            Chessboard nextBoard = new Chessboard(this.getRep());
-            nextBoard.makeMove(new Move(test.position, end));
-            return !inCheck(test.white);
+        if (connectsTo(test, end)) {
+            System.out.println("Found connection from " + test + "!");
+            // Chessboard nextBoard = new Chessboard(this.getRep());
+            // nextBoard.makeMove(new String[]{test.position, end});
+            // return !inCheck(test.white);
+            return true;
         }
         return false;
     }
 
     public boolean inCheck(boolean white) {
-        return true;
+        return false;
     }
 
-    public boolean collidesWith(int id, String position, String end) {
+    public boolean connectsTo(Piece test, String end) {
+        int[] endPos = positionToInts(end);
+        int[] startPos = positionToInts(test.position);
+        Piece dest = board[endPos[0]][endPos[1]];
+
+        // Friendly takes and pawn takes.
+        if (dest != null) {
+            System.out.println("Collision detected!");
+            if (dest.white == test.white) {
+                System.out.println("Friendly collision.");
+                return false;
+            }
+            else if (test.id == 0) {
+                int sign = test.white ? 1 : -1;
+                return endPos[1] == startPos[1] + sign && Math.abs(endPos[0] - startPos[0]) == 1;
+            }
+        }
+
+        // Get the possible squares that the piece can travel to.
+        if (test.naiveValue(end) == 0) {
+            return false;
+        }
+
+        // Test for pieces between the start and end piece.
+        List<int[]> collision = test.getCollision(end);
+        for (int[] c : collision) {
+            System.out.println(Arrays.toString(c));
+            if (board[c[0]][c[1]] != null) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -112,29 +150,47 @@ public class Chessboard {
         return rep;
     }
 
-    public void makeMove (Move move) {
-        int[] starting = positionToInt(move.getStarting());
-        int[] ending = positionToInt(move.getEnding());
-        this.board[ending[0]][ending[1]] = this.board[starting[0]][starting[1]];
-        this.board[starting[0]][starting[1]] = null;
-        this.winner = move.winner;
-        this.whiteToMove = !this.whiteToMove;
+    public void makeMove (String[] move) {
+        int[] start = positionToInts(move[0]);
+        int[] end = positionToInts(move[1]);
+        Piece startPiece = board[start[0]][start[1]];
+        Piece endPiece = board[end[0]][end[1]];
+        board[end[0]][end[1]] = startPiece;
+        startPiece.position = positionToString(end);
+        startPiece.hasMoved = true;
+        board[start[0]][start[1]] = null;
+        if (endPiece != null) {
+            List<Piece> pieceList = (endPiece.white ? white : black).get(endPiece.id);
+            pieceList.remove(endPiece);
+            System.out.println("Removing piece!");
+        }
+        whiteToMove = !whiteToMove;
     }
 
-    public static int[] positionToInt(String position) {
+    public static int[] positionToInts(String position) {
         if (position.length() != 2) {
             //throw exception;
             return new int[]{-1, -1};
         }
-        int col = Character.getNumericValue(position.charAt(0)) - 10;
-        int row = Character.getNumericValue(position.charAt(1)) - 1;
+        int row = Character.getNumericValue(position.charAt(0)) - 10;
+        int col = Character.getNumericValue(position.charAt(1)) - 1;
         return new int[]{row, col};
     }
 
+    public static String positionToString(int[] position) {
+        if (position.length != 2) {
+            //throw exception;
+            return "";
+        }
+        char row = (char) (position[0] + 97);
+        char col = (char) (position[1] + 49);
+        return String.copyValueOf(new char[] {row, col});
+    }
+    
     public static void printBoard (Piece[][] board) {
-        for (int i = 7; i >= 0; i --) {
-            for (int j = 0; j < 8; j ++) {
-                Piece p = board[i][j];
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board[j][i];
                 System.out.print((p == null ? "-" : p.toChar()) + " ");
             }
             System.out.println();

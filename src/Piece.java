@@ -48,9 +48,15 @@ public abstract class Piece {
         }
     }
 
+    public static boolean inBound(int x, int y) {
+        return (x >= 0 && x < 8 && y >= 0 && y < 8);
+    }
+
     public abstract String toString();
 
     public abstract char toChar();
 
-    public abstract List<String> getNaive();
+    public abstract int naiveValue(String end);
+
+    public abstract List<int[]> getCollision(String end);
 }

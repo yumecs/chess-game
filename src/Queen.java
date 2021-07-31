@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Queen extends Piece {
     public Queen(boolean isWhite, String newPosition) {
         this.id = 2;
@@ -10,6 +12,14 @@ public class Queen extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " queen at: " + position + ".";
+        return (white ? "White" : "Black") + " queen at: " + position;
+    }
+
+    public int naiveValue(String end) {
+        return 0;
+    }
+
+    public List<int[]> getCollision(String end) {
+        return null;
     }
 }
