@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Bishop extends Piece {
     public Bishop(boolean isWhite, String newPosition) {
@@ -23,35 +25,20 @@ public class Bishop extends Piece {
     public int getPathValue(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
-        if (startPos[0] - endPos[0] == startPos[1] - endPos[1]) {
-            return 1;
-        }
-        if (startPos[0] - endPos[0] == endPos[1] - startPos[1]) {
-            return 2;
-        }
-        return 0;
+        return Math.abs(startPos[0] - endPos[0])
+                == Math.abs(startPos[1] - endPos[1])
+                ? 1
+                : 0;
     }
 
     public List<int[]> getCollisionInterval(String end) {
-        List<int[]> collision = new ArrayList<>(8);
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
-        int minX = Math.min(startPos[0], endPos[0]);
-        int minY = Math.min(startPos[1], endPos[1]);
-        int maxX = Math.max(startPos[0], endPos[0]);
-        int maxY = Math.max(startPos[1], endPos[1]);
-        switch (getPathValue(end)) {
-            case (1):
-                for (int i = 1; i < maxX - minX; i++) {
-                    collision.add(new int[]{minX + i, minY + i});
-                }
-                break;
-            case (2):
-                for (int i = 1; i < maxX - minX; i++) {
-                    collision.add(new int[]{minX + i, maxY - i});
-                }
-                break;
-        }
-        return collision;
+        boolean diagonal = startPos[0] - endPos[0] == startPos[1] - endPos[1];
+        int delta = startPos[1] + startPos[0] * (diagonal ? -1 : 1);
+        return Util.interval(startPos[0], endPos[0])
+                .stream()
+                .map((i) -> new int[] {i, diagonal ? i + delta : delta - i})
+                .collect(Collectors.toList());
     }
 }

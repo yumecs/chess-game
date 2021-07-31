@@ -3,17 +3,17 @@ import java.util.List;
 
 public class Util {
 
-    public static int[] range(int a, int b) {
-        return range(a, b, true);
-    }
-    public static int[] range(int a, int b, boolean inclusive) {
+    public static List<Integer> range(int a, int b) {
         int start = Math.min(a, b);
         int end = Math.max(a, b);
         int[] res = new int[end - start];
-        for (int i = inclusive ? 0 : 1; i < res.length; i++) {
+        for (int i = 0; i < res.length; i++) {
             res[i] = start + i;
         }
-        return res;
+        return toList(res);
+    }
+    public static List<Integer> interval(int a, int b) {
+        return range(Math.min(a,b) + 1, Math.max(a, b));
     }
 
     public static List<Integer> toList(int[] arr) {

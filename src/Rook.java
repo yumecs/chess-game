@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Rook extends Piece {
@@ -35,24 +36,15 @@ public class Rook extends Piece {
     }
 
     public List<int[]> getCollisionInterval(String end) {
-        List<int[]> collision = new ArrayList<>(8);
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
-        List<Integer> range;
-        switch(getPathValue(end)) {
-            case(1):
-                range = Util.toList(Util.range(startPos[1], endPos[1], false));;
-                collision = range.stream()
-                        .map((i) -> new int[]{startPos[0], i})
-                        .collect(Collectors.toList());
-                break;
-            case(2):
-                range = Util.toList(Util.range(startPos[0], endPos[0], false));;
-                System.out.println(range);
-                collision = range.stream()
-                        .map((i) -> new int[]{i, startPos[i]})
-                        .collect(Collectors.toList());
-        }
-        return collision;
+        boolean vertical = startPos[0] == endPos[0];
+        int different = vertical ? 1 : 0;
+        return Util.interval(startPos[different], endPos[different])
+                .stream()
+                .map((i) -> vertical
+                        ? new int[] {startPos[0], i}
+                        : new int[] {i, startPos[1]})
+                .collect(Collectors.toList());
     }
 }
