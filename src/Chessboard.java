@@ -56,12 +56,11 @@ public class Chessboard {
     public String[] parseMove (String note) {
         note = note.replaceAll("\\s","");
         note = note.replaceAll("x","");
-        // throw exceptions based on length
+        // TODO: throw exceptions based on length
         char c = note.charAt(0);
         int id = Character.isUpperCase(c) ? Piece.idFromChar(c) : 0;
         int inc = id == 0 ? 0 : 1;
-        String start;
-        String end;
+        String start, end;
         if (note.length() > 3) {
             start = note.substring(inc, inc + 2);
             end = note.substring(inc + 2, inc + 4);
@@ -70,21 +69,19 @@ public class Chessboard {
             end = note.substring(inc, inc + 2);
             start = this.inferStart(id, end);
         }
-        return new String[]{start, end};
+        return start.equals("") ? null : new String[]{start, end};
     }
 
     public String inferStart(int id, String end) {
         List<Piece> list = (whiteToMove ? white : black).get(id);
         for (Piece test : list) {
-            System.out.println("Checking move from " + test);
             boolean legal = legalMoveTo(test, end);
             if (legal) {
-                System.out.println("Inferring: " + test.position);
+                System.out.println("Inferring: " + test.toName() + " from " + test.position + " to " + end);
                 return test.position;
             }
-            System.out.println("Failed. Next candidate.");
         }
-        // throw exception if empty string
+        // TODO: throw exception if empty string
         System.out.println("Exception: start not found.");
         return "";
     }
@@ -100,6 +97,8 @@ public class Chessboard {
         return false;
     }
 
+    // TODO: implement checks
+
     public boolean inCheck(boolean white) {
         return false;
     }
@@ -109,7 +108,6 @@ public class Chessboard {
         int[] startPos = positionToInts(test.position);
         Piece dest = board[endPos[0]][endPos[1]];
 
-        // Friendly takes and pawn takes.
         if (dest != null) {
             System.out.println("Collision detected!");
             if (dest.white == test.white) {
@@ -117,18 +115,19 @@ public class Chessboard {
                 return false;
             }
             else if (test.id == 0) {
+                // TODO: implement en passant
                 int sign = test.white ? 1 : -1;
                 return endPos[1] == startPos[1] + sign && Math.abs(endPos[0] - startPos[0]) == 1;
             }
         }
 
-        // Get the possible squares that the piece can travel to.
-        if (test.naiveValue(end) == 0) {
+        // TODO: implement castling
+
+        if (test.getPathValue(end) == 0) {
             return false;
         }
 
-        // Test for pieces between the start and end piece.
-        List<int[]> collision = test.getCollision(end);
+        List<int[]> collision = test.getCollisionInterval(end);
         for (int[] c : collision) {
             System.out.println(Arrays.toString(c));
             if (board[c[0]][c[1]] != null) {
@@ -151,6 +150,10 @@ public class Chessboard {
     }
 
     public void makeMove (String[] move) {
+        if (move == null) {
+            System.out.println("Invalid move!");
+            return;
+        }
         int[] start = positionToInts(move[0]);
         int[] end = positionToInts(move[1]);
         Piece startPiece = board[start[0]][start[1]];

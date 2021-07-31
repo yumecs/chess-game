@@ -1,5 +1,7 @@
 import java.util.List;
 
+// TODO: make all fields private
+
 public abstract class Piece {
     public int id;
     public boolean white;
@@ -43,7 +45,7 @@ public abstract class Piece {
             case 5:
                 return new King(color, pos);
             default:
-                // throw exception
+                // TODO: throw exception
                 return null;
         }
     }
@@ -52,11 +54,15 @@ public abstract class Piece {
         return (x >= 0 && x < 8 && y >= 0 && y < 8);
     }
 
+    // TODO: implement public static int naiveValueFromPosition
+
     public abstract String toString();
+
+    public abstract String toName();
 
     public abstract char toChar();
 
-    public abstract int naiveValue(String end);
+    public abstract int getPathValue(String end);
 
-    public abstract List<int[]> getCollision(String end);
+    public abstract List<int[]> getCollisionInterval(String end);
 }

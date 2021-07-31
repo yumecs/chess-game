@@ -14,11 +14,15 @@ public class Pawn extends Piece {
         return white ? 'P' : 'p';
     }
 
+    public String toName() {
+        return "Pawn";
+    }
+
     public String toString() {
         return (white ? "White" : "Black") + " Pawn at " + position;
     }
 
-    public int naiveValue(String end) {
+    public int getPathValue(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
         int sign = white ? 1 : -1;
@@ -33,11 +37,11 @@ public class Pawn extends Piece {
         return 0;
     }
 
-    public List<int[]> getCollision(String end) {
+    public List<int[]> getCollisionInterval(String end) {
         int x = Chessboard.positionToInts(position)[0];
         int y = Chessboard.positionToInts(position)[1];
         int sign = white ? 1 : -1;
-        return this.naiveValue(end) == 2
+        return this.getPathValue(end) == 2
                 ? Collections.singletonList(new int[]{x, y + sign})
                 : new ArrayList<>();
     }

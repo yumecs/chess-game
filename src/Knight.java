@@ -13,11 +13,15 @@ public class Knight extends Piece {
         return white ? 'N' : 'n';
     }
 
+    public String toName() {
+        return "Knight";
+    }
+
     public String toString() {
         return (white ? "White" : "Black") + " knight at: " + position;
     }
 
-    public int naiveValue(String end) {
+    public int getPathValue(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
@@ -25,7 +29,7 @@ public class Knight extends Piece {
         return xDiff * yDiff == 2 ? 1 : 0;
     }
 
-    public List<int[]> getCollision(String end) {
-        return new ArrayList<>();
+    public List<int[]> getCollisionInterval(String end) {
+        return new ArrayList<>(0);
     }
 }
