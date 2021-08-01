@@ -54,7 +54,9 @@ public abstract class Piece {
         return (x >= 0 && x < 8 && y >= 0 && y < 8);
     }
 
-    // TODO: implement public static int naiveValueFromPosition
+    // TODO: implement public static boolean isOnPath
+
+    // TODO: Chessboard calls onPath instead, returns null if not on path.
 
     public abstract String toString();
 
@@ -62,7 +64,7 @@ public abstract class Piece {
 
     public abstract char toChar();
 
-    public abstract int getPathValue(String end);
+    public abstract boolean isOnPath(String end);
 
     public abstract List<int[]> getCollisionInterval(String end);
 }

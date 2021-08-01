@@ -1,7 +1,6 @@
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import functional.basic.Util;
 
 public class Bishop extends Piece {
     public Bishop(boolean isWhite, String newPosition) {
@@ -22,13 +21,10 @@ public class Bishop extends Piece {
         return (white ? "White" : "Black") + " bishop at: " + position;
     }
 
-    public int getPathValue(String end) {
+    public boolean isOnPath(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
-        return Math.abs(startPos[0] - endPos[0])
-                == Math.abs(startPos[1] - endPos[1])
-                ? 1
-                : 0;
+        return Math.abs(startPos[0] - endPos[0]) == Math.abs(startPos[1] - endPos[1]);
     }
 
     public List<int[]> getCollisionInterval(String end) {

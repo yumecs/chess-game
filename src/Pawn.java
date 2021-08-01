@@ -22,27 +22,20 @@ public class Pawn extends Piece {
         return (white ? "White" : "Black") + " Pawn at " + position;
     }
 
-    public int getPathValue(String end) {
+    public boolean isOnPath(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
         int sign = white ? 1 : -1;
-        if (endPos[0] == startPos[0]) {
-            if (endPos[1] == startPos[1] + sign) {
-                return 1;
-            }
-            else if (endPos[1] == startPos[1] + sign * 2) {
-                return 2;
-            }
-        }
-        return 0;
+        return endPos[0] == startPos[0]
+                && (endPos[1] == startPos[1] + sign || endPos[1] == startPos[1] + 2 * sign);
     }
 
     public List<int[]> getCollisionInterval(String end) {
-        int x = Chessboard.positionToInts(position)[0];
-        int y = Chessboard.positionToInts(position)[1];
+        int[] startPos = Chessboard.positionToInts(position);
+        int[] endPos = Chessboard.positionToInts(end);
         int sign = white ? 1 : -1;
-        return this.getPathValue(end) == 2
-                ? Collections.singletonList(new int[]{x, y + sign})
+        return this.isOnPath(end) && (endPos[1] > startPos[1] + sign)
+                ? Collections.singletonList(new int[]{startPos[0], startPos[1] + sign})
                 : new ArrayList<>();
     }
 }

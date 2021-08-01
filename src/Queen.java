@@ -19,15 +19,15 @@ public class Queen extends Piece {
         return (white ? "White" : "Black") + " queen at: " + position;
     }
 
-    public int getPathValue(String end) {
+    public boolean isOnPath(String end) {
         Piece rook = new Rook(this.white, this.position);
         Piece bishop = new Bishop(this.white, this.position);
-        return rook.getPathValue(end) > 0 || bishop.getPathValue(end) > 0 ? 1 : 0;
+        return rook.isOnPath(end) || bishop.isOnPath(end);
     }
 
     public List<int[]> getCollisionInterval(String end) {
         Piece rook = new Rook(this.white, this.position);
         Piece bishop = new Bishop(this.white, this.position);
-        return rook.getPathValue(end) > 0 ? rook.getCollisionInterval(end) : bishop.getCollisionInterval(end);
+        return rook.isOnPath(end) ? rook.getCollisionInterval(end) : bishop.getCollisionInterval(end);
     }
 }

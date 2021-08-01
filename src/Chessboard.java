@@ -1,5 +1,6 @@
+// TODO: implement Position
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Chessboard {
@@ -75,11 +76,7 @@ public class Chessboard {
     public String inferStart(int id, String end) {
         List<Piece> list = (whiteToMove ? white : black).get(id);
         for (Piece test : list) {
-            boolean legal = legalMoveTo(test, end);
-            if (legal) {
-                System.out.println("Inferring: " + test.toName() + " from " + test.position + " to " + end);
-                return test.position;
-            }
+            if (legalMoveTo(test, end)) return test.position;
         }
         // TODO: throw exception if empty string
         System.out.println("Exception: start not found.");
@@ -88,11 +85,9 @@ public class Chessboard {
 
     public boolean legalMoveTo(Piece test, String end) {
         if (connectsTo(test, end)) {
-            System.out.println("Found connection from " + test + "!");
-            // Chessboard nextBoard = new Chessboard(this.getRep());
-            // nextBoard.makeMove(new String[]{test.position, end});
-            // return !inCheck(test.white);
-            return true;
+            Chessboard nextBoard = new Chessboard(this.getRep());
+            nextBoard.makeMove(new String[]{test.position, end});
+            return !inCheck(test.white);
         }
         return false;
     }
@@ -100,7 +95,11 @@ public class Chessboard {
     // TODO: implement checks
 
     public boolean inCheck(boolean white) {
-        return false;
+        Piece king = (white ? this.white : this.black).get(5).get(0);
+        // check pawn takes
+        for (int i = 1; i < 6; i++) {
+
+        }
     }
 
     public boolean connectsTo(Piece test, String end) {
@@ -123,13 +122,12 @@ public class Chessboard {
 
         // TODO: implement castling
 
-        if (test.getPathValue(end) == 0) {
+        if (!test.isOnPath(end)) {
             return false;
         }
 
         List<int[]> collision = test.getCollisionInterval(end);
         for (int[] c : collision) {
-            System.out.println(Arrays.toString(c));
             if (board[c[0]][c[1]] != null) {
                 return false;
             }

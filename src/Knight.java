@@ -21,12 +21,12 @@ public class Knight extends Piece {
         return (white ? "White" : "Black") + " knight at: " + position;
     }
 
-    public int getPathValue(String end) {
+    public boolean isOnPath(String end) {
         int[] startPos = Chessboard.positionToInts(position);
         int[] endPos = Chessboard.positionToInts(end);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
         int yDiff = Math.abs(startPos[1] - endPos[1]);
-        return xDiff * yDiff == 2 ? 1 : 0;
+        return xDiff * yDiff == 2;
     }
 
     public List<int[]> getCollisionInterval(String end) {
