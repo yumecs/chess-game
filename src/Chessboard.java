@@ -6,10 +6,24 @@ import java.util.List;
 public class Chessboard {
     public boolean whiteToMove;
     public Piece[][] board;
-    public List<List<Piece>> black;
-    public List<List<Piece>> white;
+    public List<List<Piece>> blackPieces;
+    public List<List<Piece>> whitePieces;
     public int winner;
-    public static final String[][] INIT_BOARD = {
+
+    private static final int PAWN = 0;
+    private static final int KNIGHT = 1;
+    private static final int BISHOP = 2;
+    private static final int ROOK = 3;
+    private static final int QUEEN = 4;
+    private static final int KING = 5;
+    private static final int PIECE_TYPES = 6;
+
+    private static final int BOARD_SIDE = 8;
+
+    private static final int WHITE = 0;
+    private static final int BLACK = 1;
+
+    private static final String[][] INIT_BOARD = {
         {"a2","b2","c2","d2","e2","f2","g2","h2"},
         {"b1","g1"},
         {"c1","f1"},
@@ -28,9 +42,9 @@ public class Chessboard {
 
     public Chessboard(String[][] state, boolean whiteToMove) {
         this.whiteToMove = whiteToMove;
-        board = new Piece[8][8];
-        white = new ArrayList<>(6);
-        black = new ArrayList<>(6);
+        board = new Piece[BOARD_SIDE][BOARD_SIDE];
+        whitePieces = new ArrayList<>(PIECE_TYPES);
+        blackPieces = new ArrayList<>(PIECE_TYPES);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 board[i][j] = null;
@@ -38,11 +52,11 @@ public class Chessboard {
         }
         for (int i = 0; i < state.length; i++) {
             List<Piece> pieceList = new ArrayList<>(state[i].length);
-            (i < 6 ? white : black).add(pieceList);
+            (i < PIECE_TYPES ? whitePieces : blackPieces).add(pieceList);
             for (int j = 0; j < state[i].length; j++) {
                 int row = positionToInts(state[i][j])[0];
                 int col = positionToInts(state[i][j])[1];
-                Piece newPiece = Piece.fromInt(i % 6, i < 6, state[i][j]);
+                Piece newPiece = Piece.fromInt(i % PIECE_TYPES, i < PIECE_TYPES, state[i][j]);
                 board[row][col] = newPiece;
                 pieceList.add(newPiece);
             }
@@ -59,7 +73,7 @@ public class Chessboard {
         note = note.replaceAll("x","");
         // TODO: throw exceptions based on length
         char c = note.charAt(0);
-        int id = Character.isUpperCase(c) ? Piece.idFromChar(c) : 0;
+        int id = Character.isUpperCase(c) ? Piece.idFromChar(c) : PAWN;
         int inc = id == 0 ? 0 : 1;
         String start, end;
         if (note.length() > 3) {
@@ -74,7 +88,7 @@ public class Chessboard {
     }
 
     public String inferStart(int id, String end) {
-        List<Piece> list = (whiteToMove ? white : black).get(id);
+        List<Piece> list = (whiteToMove ? whitePieces : blackPieces).get(id);
         for (Piece test : list) {
             if (legalMoveTo(test, end)) return test.position;
         }
@@ -93,20 +107,13 @@ public class Chessboard {
     }
 
     public boolean inCheck() {
-        List<List<Piece>> self = whiteToMove ? black : white;
-        List<List<Piece>> opponent =  whiteToMove ? white : black;
-        String kingPos = self.get(5).get(0).position;
+        List<List<Piece>> self = whiteToMove ? blackPieces : whitePieces;
+        List<List<Piece>> opponent =  whiteToMove ? whitePieces : blackPieces;
+        String kingPos = self.get(KING).get(0).position;
         // TODO: check pawn takes separately
-        for (int i = 0; i < 6; i++) {
-            for (Piece p : opponent.get(i)) {
-                if (connectsTo(p, kingPos)) {
-                    System.out.println("Check discovered!"
-                            + (whiteToMove ? " Black" : " White")
-                            + " will be in check.");
-                    System.out.println(p);
-                    System.out.println(self.get(5).get(0));
-                    return true;
-                }
+        for (List<Piece> pList : opponent) {
+            for (Piece p : pList) {
+                if (connectsTo(p, kingPos)) return true;
             }
         }
         return false;
@@ -118,12 +125,12 @@ public class Chessboard {
         Piece dest = board[endPos[0]][endPos[1]];
 
         if (dest != null) {
-            if (dest.white == test.white) {
+            if (dest.isWhite == test.isWhite) {
                 return false;
             }
-            else if (test.id == 0) {
+            else if (test.id == PAWN) {
                 // TODO: implement en passant
-                int sign = test.white ? 1 : -1;
+                int sign = test.isWhite ? 1 : -1;
                 return endPos[1] == startPos[1] + sign && Math.abs(endPos[0] - startPos[0]) == 1;
             }
         }
@@ -144,9 +151,10 @@ public class Chessboard {
     }
 
     public String[][] getRep() {
-        String[][] rep = new String[12][];
-        for (int i = 0; i < 12; i++) {
-            List<Piece> pieces = (i < 6 ? white : black).get(i % 6);
+        String[][] rep = new String[PIECE_TYPES * 2][];
+        for (int i = 0; i < PIECE_TYPES * 2; i++) {
+            List<Piece> pieces = (i < PIECE_TYPES ? whitePieces : blackPieces)
+                    .get(i % PIECE_TYPES);
             rep[i] = new String[pieces.size()];
             for (int j = 0; j < pieces.size(); j++) {
                 rep[i][j] = pieces.get(j).position;
@@ -169,7 +177,7 @@ public class Chessboard {
         startPiece.hasMoved = true;
         board[start[0]][start[1]] = null;
         if (endPiece != null) {
-            List<Piece> pieceList = (endPiece.white ? white : black).get(endPiece.id);
+            List<Piece> pieceList = (endPiece.isWhite ? whitePieces : blackPieces).get(endPiece.id);
             pieceList.remove(endPiece);
             System.out.println("Removing piece!");
         }
@@ -197,8 +205,8 @@ public class Chessboard {
     }
     
     public static void printBoard (Piece[][] board) {
-        for (int i = 7; i >= 0; i--) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = BOARD_SIDE - 1; i >= 0; i--) {
+            for (int j = 0; j < BOARD_SIDE; j++) {
                 Piece p = board[j][i];
                 System.out.print((p == null ? "-" : p.toChar()) + " ");
             }

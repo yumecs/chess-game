@@ -3,12 +3,12 @@ import java.util.List;
 public class Queen extends Piece {
     public Queen(boolean isWhite, String newPosition) {
         this.id = 2;
-        this.white = isWhite;
+        this.isWhite = isWhite;
         this.position = newPosition;
     }
 
     public char toChar() {
-        return white ? 'Q' : 'q';
+        return isWhite ? 'Q' : 'q';
     }
 
     public String toName() {
@@ -16,18 +16,18 @@ public class Queen extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " queen at: " + position;
+        return (isWhite ? "White" : "Black") + " queen at: " + position;
     }
 
-    public boolean isOnPath(String end) {
-        Piece rook = new Rook(this.white, this.position);
-        Piece bishop = new Bishop(this.white, this.position);
-        return rook.isOnPath(end) || bishop.isOnPath(end);
+    public boolean isOnPath(String endPosition) {
+        Piece rook = new Rook(this.isWhite, this.position);
+        Piece bishop = new Bishop(this.isWhite, this.position);
+        return rook.isOnPath(endPosition) || bishop.isOnPath(endPosition);
     }
 
-    public List<int[]> getCollisionInterval(String end) {
-        Piece rook = new Rook(this.white, this.position);
-        Piece bishop = new Bishop(this.white, this.position);
-        return rook.isOnPath(end) ? rook.getCollisionInterval(end) : bishop.getCollisionInterval(end);
+    public List<int[]> getCollisionInterval(String endPosition) {
+        Piece rook = new Rook(this.isWhite, this.position);
+        Piece bishop = new Bishop(this.isWhite, this.position);
+        return rook.isOnPath(endPosition) ? rook.getCollisionInterval(endPosition) : bishop.getCollisionInterval(endPosition);
     }
 }

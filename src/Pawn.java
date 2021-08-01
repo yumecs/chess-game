@@ -5,13 +5,13 @@ import java.util.List;
 public class Pawn extends Piece {
     public Pawn(boolean isWhite, String newPosition) {
         this.id = 0;
-        this.white = isWhite;
+        this.isWhite = isWhite;
         this.position = newPosition;
         this.hasMoved = false;
     }
 
     public char toChar() {
-        return white ? 'P' : 'p';
+        return isWhite ? 'P' : 'p';
     }
 
     public String toName() {
@@ -19,22 +19,22 @@ public class Pawn extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " Pawn at " + position;
+        return (isWhite ? "White" : "Black") + " Pawn at " + position;
     }
 
-    public boolean isOnPath(String end) {
+    public boolean isOnPath(String endPosition) {
         int[] startPos = Chessboard.positionToInts(position);
-        int[] endPos = Chessboard.positionToInts(end);
-        int sign = white ? 1 : -1;
+        int[] endPos = Chessboard.positionToInts(endPosition);
+        int sign = isWhite ? 1 : -1;
         return endPos[0] == startPos[0]
                 && (endPos[1] == startPos[1] + sign || endPos[1] == startPos[1] + 2 * sign);
     }
 
-    public List<int[]> getCollisionInterval(String end) {
+    public List<int[]> getCollisionInterval(String endPosition) {
         int[] startPos = Chessboard.positionToInts(position);
-        int[] endPos = Chessboard.positionToInts(end);
-        int sign = white ? 1 : -1;
-        return this.isOnPath(end) && (endPos[1] > startPos[1] + sign)
+        int[] endPos = Chessboard.positionToInts(endPosition);
+        int sign = isWhite ? 1 : -1;
+        return this.isOnPath(endPosition) && (endPos[1] > startPos[1] + sign)
                 ? Collections.singletonList(new int[]{startPos[0], startPos[1] + sign})
                 : new ArrayList<>();
     }

@@ -4,12 +4,12 @@ import java.util.List;
 public class King extends Piece {
     public King(boolean isWhite, String newPosition) {
         this.id = 2;
-        this.white = isWhite;
+        this.isWhite = isWhite;
         this.position = newPosition;
     }
 
     public char toChar() {
-        return white ? 'K' : 'k';
+        return isWhite ? 'K' : 'k';
     }
 
     public String toName() {
@@ -17,18 +17,18 @@ public class King extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " king at: " + position;
+        return (isWhite ? "White" : "Black") + " king at: " + position;
     }
 
-    public boolean isOnPath(String end) {
+    public boolean isOnPath(String endPosition) {
         int[] startPos = Chessboard.positionToInts(position);
-        int[] endPos = Chessboard.positionToInts(end);
+        int[] endPos = Chessboard.positionToInts(endPosition);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
         int yDiff = Math.abs(startPos[1] - endPos[1]);
         return xDiff < 2 && yDiff < 2;
     }
 
-    public List<int[]> getCollisionInterval(String end) {
+    public List<int[]> getCollisionInterval(String endPosition) {
         return new ArrayList<>(0);
     }
 }

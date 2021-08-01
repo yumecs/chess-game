@@ -4,13 +4,13 @@ import java.util.List;
 public class Knight extends Piece {
     public Knight(boolean isWhite, String newPosition) {
         this.id = 1;
-        this.white = isWhite;
+        this.isWhite = isWhite;
         this.position = newPosition;
         this.hasMoved = false;
     }
 
     public char toChar() {
-        return white ? 'N' : 'n';
+        return isWhite ? 'N' : 'n';
     }
 
     public String toName() {
@@ -18,18 +18,18 @@ public class Knight extends Piece {
     }
 
     public String toString() {
-        return (white ? "White" : "Black") + " knight at: " + position;
+        return (isWhite ? "White" : "Black") + " knight at: " + position;
     }
 
-    public boolean isOnPath(String end) {
+    public boolean isOnPath(String endPosition) {
         int[] startPos = Chessboard.positionToInts(position);
-        int[] endPos = Chessboard.positionToInts(end);
+        int[] endPos = Chessboard.positionToInts(endPosition);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
         int yDiff = Math.abs(startPos[1] - endPos[1]);
         return xDiff * yDiff == 2;
     }
 
-    public List<int[]> getCollisionInterval(String end) {
+    public List<int[]> getCollisionInterval(String endPosition) {
         return new ArrayList<>(0);
     }
 }
