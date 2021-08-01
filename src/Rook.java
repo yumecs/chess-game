@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import functional.basic.Util;
 
@@ -32,9 +33,9 @@ public class Rook extends Piece {
         int[] endPos = Chessboard.positionToInts(end);
         boolean vertical = startPos[0] == endPos[0];
         int different = vertical ? 1 : 0;
-        return Util.interval(startPos[different], endPos[different])
-                .stream()
-                .map((i) -> vertical ? new int[] {startPos[0], i} : new int[] {i, startPos[1]})
-                .collect(Collectors.toList());
+        Function<Integer, int[]> fn = (i) -> vertical
+                ? new int[] {startPos[0], i}
+                : new int[] {i, startPos[1]};
+        return Util.map(Util.interval(startPos[different], endPos[different]), fn);
     }
 }

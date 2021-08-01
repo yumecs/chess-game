@@ -25,7 +25,7 @@ public class King extends Piece {
         int[] endPos = Chessboard.positionToInts(end);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
         int yDiff = Math.abs(startPos[1] - endPos[1]);
-        return xDiff * yDiff < 2;
+        return xDiff < 2 && yDiff < 2;
     }
 
     public List<int[]> getCollisionInterval(String end) {

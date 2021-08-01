@@ -26,8 +26,8 @@ public class Chessboard {
 
     // Initialize a new chessboard.
 
-    public Chessboard(String[][] state) {
-        whiteToMove = true;
+    public Chessboard(String[][] state, boolean whiteToMove) {
+        this.whiteToMove = whiteToMove;
         board = new Piece[8][8];
         white = new ArrayList<>(6);
         black = new ArrayList<>(6);
@@ -51,7 +51,7 @@ public class Chessboard {
     }
 
     public Chessboard() {
-        this(INIT_BOARD);
+        this(INIT_BOARD, true);
     }
 
     public String[] parseMove (String note) {
@@ -85,21 +85,31 @@ public class Chessboard {
 
     public boolean legalMoveTo(Piece test, String end) {
         if (connectsTo(test, end)) {
-            Chessboard nextBoard = new Chessboard(this.getRep());
+            Chessboard nextBoard = new Chessboard(this.getRep(), this.whiteToMove);
             nextBoard.makeMove(new String[]{test.position, end});
-            return !inCheck(test.white);
+            return !nextBoard.inCheck();
         }
         return false;
     }
 
-    // TODO: implement checks
-
-    public boolean inCheck(boolean white) {
-        Piece king = (white ? this.white : this.black).get(5).get(0);
-        // check pawn takes
-        for (int i = 1; i < 6; i++) {
-
+    public boolean inCheck() {
+        List<List<Piece>> self = whiteToMove ? black : white;
+        List<List<Piece>> opponent =  whiteToMove ? white : black;
+        String kingPos = self.get(5).get(0).position;
+        // TODO: check pawn takes separately
+        for (int i = 0; i < 6; i++) {
+            for (Piece p : opponent.get(i)) {
+                if (connectsTo(p, kingPos)) {
+                    System.out.println("Check discovered!"
+                            + (whiteToMove ? " Black" : " White")
+                            + " will be in check.");
+                    System.out.println(p);
+                    System.out.println(self.get(5).get(0));
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
     public boolean connectsTo(Piece test, String end) {
@@ -108,9 +118,7 @@ public class Chessboard {
         Piece dest = board[endPos[0]][endPos[1]];
 
         if (dest != null) {
-            System.out.println("Collision detected!");
             if (dest.white == test.white) {
-                System.out.println("Friendly collision.");
                 return false;
             }
             else if (test.id == 0) {

@@ -7,7 +7,8 @@ public class Main {
             System.out.println("*");
             Chessboard.printBoard(beatrice.board);
             Scanner myObj = new Scanner(System.in);
-            System.out.print("\n\nEnter move: ");
+            System.out.print("\n\n" + (beatrice.whiteToMove ? "White" : "Black"));
+            System.out.print(" to move. Enter move: ");
             String nextMove = myObj.nextLine();
             System.out.print("\033[H\033[2J");
             System.out.flush();
