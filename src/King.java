@@ -3,13 +3,14 @@ import java.util.List;
 
 public class King extends Piece {
     public King(boolean isWhite, String newPosition) {
-        this.id = 2;
-        this.isWhite = isWhite;
-        this.position = newPosition;
+        this.setId(KING);
+        this.setColor(isWhite);
+        this.setPosition(newPosition);
+        this.setHasMoved(false);
     }
 
     public char toChar() {
-        return isWhite ? 'K' : 'k';
+        return this.getIsWhite() ? 'K' : 'k';
     }
 
     public String toName() {
@@ -17,11 +18,11 @@ public class King extends Piece {
     }
 
     public String toString() {
-        return (isWhite ? "White" : "Black") + " king at: " + position;
+        return (this.getIsWhite() ? "White" : "Black") + " king at: " + this.getPosition();
     }
 
     public boolean isOnPath(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(position);
+        int[] startPos = Chessboard.positionToInts(this.getPosition());
         int[] endPos = Chessboard.positionToInts(endPosition);
         int xDiff = Math.abs(startPos[0] - endPos[0]);
         int yDiff = Math.abs(startPos[1] - endPos[1]);

@@ -4,13 +4,14 @@ import functional.basic.Util;
 
 public class Rook extends Piece {
     public Rook(boolean isWhite, String newPosition) {
-        this.id = 2;
-        this.isWhite = isWhite;
-        this.position = newPosition;
+        this.setId(ROOK);
+        this.setColor(isWhite);
+        this.setPosition(newPosition);
+        this.setHasMoved(false);
     }
 
     public char toChar() {
-        return isWhite ? 'R' : 'r';
+        return this.getIsWhite() ? 'R' : 'r';
     }
 
     public String toName() {
@@ -18,17 +19,17 @@ public class Rook extends Piece {
     }
 
     public String toString() {
-        return (isWhite ? "White" : "Black") + " rook at: " + position;
+        return (this.getIsWhite() ? "White" : "Black") + " rook at: " + this.getPosition();
     }
 
     public boolean isOnPath(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(position);
+        int[] startPos = Chessboard.positionToInts(this.getPosition());
         int[] endPos = Chessboard.positionToInts(endPosition);
         return startPos[0] == endPos[0] || startPos[1] == endPos[1];
     }
 
     public List<int[]> getCollisionInterval(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(position);
+        int[] startPos = Chessboard.positionToInts(this.getPosition());
         int[] endPos = Chessboard.positionToInts(endPosition);
         boolean vertical = startPos[0] == endPos[0];
         int different = vertical ? 1 : 0;

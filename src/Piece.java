@@ -3,23 +3,32 @@ import java.util.List;
 // TODO: make all fields private
 
 public abstract class Piece {
-    public int id;
-    public boolean isWhite;
-    public String position;
-    public boolean hasMoved;
+    private int id;
+    private boolean isWhite;
+    private String position;
+    private boolean hasMoved;
+
+    public static final int PAWN = 0;
+    public static final int KNIGHT = 1;
+    public static final int BISHOP = 2;
+    public static final int ROOK = 3;
+    public static final int QUEEN = 4;
+    public static final int KING = 5;
 
     public static int idFromChar(char c) {
         switch (c) {
+            case ' ':
+                return PAWN;
             case 'N':
-                return 1;
+                return KNIGHT;
             case 'B':
-                return 2;
+                return BISHOP;
             case 'R':
-                return 3;
+                return ROOK;
             case 'Q':
-                return 4;
+                return QUEEN;
             case 'K':
-                return 5;
+                return KING;
             default:
                 // throw exception
                 return -1;
@@ -30,19 +39,19 @@ public abstract class Piece {
         return fromInt(idFromChar(c), color, pos);
     } **/
 
-    public static Piece fromInt(int i, boolean isWhite, String position) {
-        switch (i) {
-            case 0:
+    public static Piece fromInt(int id, boolean isWhite, String position) {
+        switch (id) {
+            case PAWN:
                 return new Pawn(isWhite, position);
-            case 1:
+            case KNIGHT:
                 return new Knight(isWhite, position);
-            case 2:
+            case BISHOP:
                 return new Bishop(isWhite, position);
-            case 3:
+            case ROOK:
                 return new Rook(isWhite, position);
-            case 4:
+            case QUEEN:
                 return new Queen(isWhite, position);
-            case 5:
+            case KING:
                 return new King(isWhite, position);
             default:
                 // TODO: throw exception
@@ -58,13 +67,46 @@ public abstract class Piece {
 
     // TODO: Chessboard calls onPath instead, returns null if not on path.
 
+    protected int getId() {
+        return this.id;
+    }
+
+    protected void setId(int id) {
+        this.id = id;
+    }
+
+    protected boolean getIsWhite() {
+        return this.isWhite;
+    }
+
+    protected void setColor(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
+
+    protected String getPosition() {
+        return this.position;
+    }
+
+    protected void setPosition(String position) {
+        this.position = position;
+    }
+
+    protected boolean getHasMoved() {
+        return this.hasMoved;
+    }
+
+    protected void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
     public abstract String toString();
 
     public abstract String toName();
 
     public abstract char toChar();
 
-    public abstract boolean isOnPath(String endPosition);
+    protected abstract boolean isOnPath(String endPosition);
 
-    public abstract List<int[]> getCollisionInterval(String endPosition);
+    protected abstract List<int[]> getCollisionInterval(String endPosition);
+
 }
