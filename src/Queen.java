@@ -1,7 +1,7 @@
 import java.util.List;
 
 public class Queen extends Piece {
-    public Queen(boolean isWhite, String newPosition) {
+    public Queen(boolean isWhite, Position newPosition) {
         this.setId(QUEEN);
         this.setColor(isWhite);
         this.setPosition(newPosition);
@@ -20,15 +20,15 @@ public class Queen extends Piece {
         return (this.getIsWhite() ? "White" : "Black") + " queen at: " + this.getPosition();
     }
 
-    public boolean isOnPath(String endPosition) {
+    public boolean isOnPath(Position endPos) {
         Piece rook = new Rook(this.getIsWhite(), this.getPosition());
         Piece bishop = new Bishop(this.getIsWhite(), this.getPosition());
-        return rook.isOnPath(endPosition) || bishop.isOnPath(endPosition);
+        return rook.isOnPath(endPos) || bishop.isOnPath(endPos);
     }
 
-    public List<int[]> getCollisionInterval(String endPosition) {
+    public List<Position> getCollisionInterval(Position endPos) {
         Piece rook = new Rook(this.getIsWhite(), this.getPosition());
         Piece bishop = new Bishop(this.getIsWhite(), this.getPosition());
-        return rook.isOnPath(endPosition) ? rook.getCollisionInterval(endPosition) : bishop.getCollisionInterval(endPosition);
+        return rook.isOnPath(endPos) ? rook.getCollisionInterval(endPos) : bishop.getCollisionInterval(endPos);
     }
 }

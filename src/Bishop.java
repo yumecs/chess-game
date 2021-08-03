@@ -3,7 +3,7 @@ import java.util.function.Function;
 import functional.basic.Util;
 
 public class Bishop extends Piece {
-    public Bishop(boolean isWhite, String newPosition) {
+    public Bishop(boolean isWhite, Position newPosition) {
         this.setId(BISHOP);
         this.setColor(isWhite);
         this.setPosition(newPosition);
@@ -22,18 +22,16 @@ public class Bishop extends Piece {
         return (this.getIsWhite() ? "White" : "Black") + " bishop at: " + this.getPosition();
     }
 
-    public boolean isOnPath(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(this.getPosition());
-        int[] endPos = Chessboard.positionToInts(endPosition);
-        return Math.abs(startPos[0] - endPos[0]) == Math.abs(startPos[1] - endPos[1]);
+    public boolean isOnPath(Position endPos) {
+        Position startPos = this.getPosition();
+        return Math.abs(startPos.getX() - endPos.getX()) == Math.abs(startPos.getY() - endPos.getY());
     }
 
-    public List<int[]> getCollisionInterval(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(this.getPosition());
-        int[] endPos = Chessboard.positionToInts(endPosition);
-        boolean diagonal = startPos[0] - endPos[0] == startPos[1] - endPos[1];
-        int delta = startPos[1] + startPos[0] * (diagonal ? -1 : 1);
-        Function<Integer, int[]> fn = (i) -> new int[] {i, diagonal ? i + delta : delta - i};
-        return Util.map(Util.interval(startPos[0], endPos[0]), fn);
+    public List<Position> getCollisionInterval(Position endPos) {
+        Position startPos = this.getPosition();
+        boolean diagonal = startPos.getX() - endPos.getX() == startPos.getY() - endPos.getY();
+        int delta = startPos.getY() + startPos.getX() * (diagonal ? -1 : 1);
+        Function<Integer, Position> fn = (i) -> new Position(i, diagonal ? i + delta : delta - i);
+        return Util.map(Util.interval(startPos.getX(), endPos.getX()), fn);
     }
 }

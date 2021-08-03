@@ -3,7 +3,7 @@ import java.util.function.Function;
 import functional.basic.Util;
 
 public class Rook extends Piece {
-    public Rook(boolean isWhite, String newPosition) {
+    public Rook(boolean isWhite, Position newPosition) {
         this.setId(ROOK);
         this.setColor(isWhite);
         this.setPosition(newPosition);
@@ -22,20 +22,19 @@ public class Rook extends Piece {
         return (this.getIsWhite() ? "White" : "Black") + " rook at: " + this.getPosition();
     }
 
-    public boolean isOnPath(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(this.getPosition());
-        int[] endPos = Chessboard.positionToInts(endPosition);
-        return startPos[0] == endPos[0] || startPos[1] == endPos[1];
+    public boolean isOnPath(Position endPos) {
+        Position startPos = this.getPosition();
+        return startPos.getX() == endPos.getX() || startPos.getY() == endPos.getY();
     }
 
-    public List<int[]> getCollisionInterval(String endPosition) {
-        int[] startPos = Chessboard.positionToInts(this.getPosition());
-        int[] endPos = Chessboard.positionToInts(endPosition);
-        boolean vertical = startPos[0] == endPos[0];
-        int different = vertical ? 1 : 0;
-        Function<Integer, int[]> fn = (i) -> vertical
-                ? new int[] {startPos[0], i}
-                : new int[] {i, startPos[1]};
-        return Util.map(Util.interval(startPos[different], endPos[different]), fn);
+    public List<Position> getCollisionInterval(Position endPos) {
+        Position startPos = this.getPosition();
+        boolean vertical = startPos.getX() == endPos.getX();
+        int startDifferent = vertical ? startPos.getY() : startPos.getX();
+        int endDifferent = vertical ? endPos.getY() : startPos.getX();
+        Function<Integer, Position> fn = (i) -> vertical
+                ? new Position(startPos.getX(), i)
+                : new Position(i, startPos.getY());
+        return Util.map(Util.interval(startDifferent,endDifferent), fn);
     }
 }

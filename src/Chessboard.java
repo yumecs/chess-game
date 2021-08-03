@@ -14,9 +14,9 @@ public class Chessboard {
 
     public static final int PIECE_TYPES = 6;
     public static final int BOARD_SIDE = 8;
-    public static final int NONE = -1;
-    public static final int WHITE = 0;
-    public static final int BLACK = 1;
+    public static final int PLAYER_NONE = -1;
+    public static final int PLAYER_WHITE = 0;
+    public static final int PLAYER_BLACK = 1;
 
     public static final String[][] INIT_BOARD = {
         {"a2","b2","c2","d2","e2","f2","g2","h2"},
@@ -37,7 +37,7 @@ public class Chessboard {
 
     public Chessboard(String[][] state, boolean whiteToMove) {
         this.whiteToMove = whiteToMove;
-        this.winner = NONE;
+        this.winner = PLAYER_NONE;
         board = new Piece[BOARD_SIDE][BOARD_SIDE];
         whitePieces = new ArrayList<>(PIECE_TYPES);
         blackPieces = new ArrayList<>(PIECE_TYPES);
@@ -50,10 +50,9 @@ public class Chessboard {
             List<Piece> pieceList = new ArrayList<>(state[i].length);
             (i < PIECE_TYPES ? whitePieces : blackPieces).add(pieceList);
             for (int j = 0; j < state[i].length; j++) {
-                int row = positionToInts(state[i][j])[0];
-                int col = positionToInts(state[i][j])[1];
-                Piece newPiece = Piece.fromInt(i % PIECE_TYPES, i < PIECE_TYPES, state[i][j]);
-                board[row][col] = newPiece;
+                Position newPos = new Position(state[i][j]);
+                Piece newPiece = Piece.fromInt(i % PIECE_TYPES, i < PIECE_TYPES, newPos);
+                board[newPos.getX()][newPos.getY()] = newPiece;
                 pieceList.add(newPiece);
             }
         }
@@ -64,41 +63,41 @@ public class Chessboard {
         this(INIT_BOARD, true);
     }
 
-    public String[] parseMove (String note) {
+    public Position[] parseMove (String note) {
         note = note.replaceAll("\\s","");
         note = note.replaceAll("x","");
         // TODO: throw exceptions based on length
         char c = note.charAt(0);
         int id = Character.isUpperCase(c) ? Piece.idFromChar(c) : Piece.PAWN;
         int inc = id == 0 ? 0 : 1;
-        String start, end;
+        Position start, end;
         if (note.length() > 3) {
-            start = note.substring(inc, inc + 2);
-            end = note.substring(inc + 2, inc + 4);
+            start = new Position(note.substring(inc, inc + 2));
+            end = new Position(note.substring(inc + 2, inc + 4));
         }
         else {
-            end = note.substring(inc, inc + 2);
+            end = new Position(note.substring(inc, inc + 2));
             start = this.inferStart(id, end);
         }
-        return start.equals("") ? null : new String[]{start, end};
+        return start.getX() == -1 ? null : new Position[]{start, end};
     }
 
-    public String inferStart(int id, String end) {
+    public Position inferStart(int id, Position end) {
         List<Piece> pieceList = (whiteToMove ? whitePieces : blackPieces).get(id);
         for (Piece test : pieceList) {
             if (legalMoveTo(test, end)) return test.getPosition();
         }
         // TODO: throw exception if empty string
         System.out.println("Exception: start not found.");
-        return "";
+        return new Position(-1, -1);
     }
 
-    public boolean legalMoveTo(Piece test, String end) {
+    public boolean legalMoveTo(Piece test, Position end) {
         // Verify if there is a possible move to the end position.
         if (connectsTo(test, end)) {
             // Verify if the next move will result in a checkmate.
             Chessboard nextBoard = new Chessboard(this.getRep(), this.whiteToMove);
-            nextBoard.makeMove(new String[]{test.getPosition(), end});
+            nextBoard.makeMove(new Position[]{test.getPosition(), end});
             return !nextBoard.inCheck();
         }
         return false;
@@ -107,7 +106,7 @@ public class Chessboard {
     public boolean inCheck() {
         List<List<Piece>> self = whiteToMove ? blackPieces : whitePieces;
         List<List<Piece>> opponent =  whiteToMove ? whitePieces : blackPieces;
-        String kingPos = self.get(Piece.KING).get(0).getPosition();
+        Position kingPos = self.get(Piece.KING).get(0).getPosition();
         // TODO: check pawn takes separately
         for (List<Piece> pList : opponent) {
             for (Piece p : pList) {
@@ -117,10 +116,9 @@ public class Chessboard {
         return false;
     }
 
-    public boolean connectsTo(Piece test, String end) {
-        int[] endPos = positionToInts(end);
-        int[] startPos = positionToInts(test.getPosition());
-        Piece dest = board[endPos[0]][endPos[1]];
+    public boolean connectsTo(Piece test, Position endPos) {
+        Position startPos = test.getPosition();
+        Piece dest = board[endPos.getX()][endPos.getY()];
 
         if (dest != null) {
             if (dest.getIsWhite() == test.getIsWhite()) {
@@ -131,19 +129,19 @@ public class Chessboard {
                 // Pawn takes are implemented separately.
                 // TODO: implement en passant
                 int sign = test.getIsWhite() ? 1 : -1;
-                return endPos[1] == startPos[1] + sign && Math.abs(endPos[0] - startPos[0]) == 1;
+                return endPos.getY() == startPos.getY() + sign && Math.abs(endPos.getX() - startPos.getX()) == 1;
             }
         }
 
         // TODO: implement castling
 
-        if (!test.isOnPath(end)) {
+        if (!test.isOnPath(endPos)) {
             return false;
         }
 
-        List<int[]> collision = test.getCollisionInterval(end);
-        for (int[] c : collision) {
-            if (board[c[0]][c[1]] != null) {
+        List<Position> collision = test.getCollisionInterval(endPos);
+        for (Position c : collision) {
+            if (board[c.getX()][c.getY()] != null) {
                 return false;
             }
         }
@@ -157,51 +155,31 @@ public class Chessboard {
                     .get(i % PIECE_TYPES);
             rep[i] = new String[pieces.size()];
             for (int j = 0; j < pieces.size(); j++) {
-                rep[i][j] = pieces.get(j).getPosition();
+                rep[i][j] = pieces.get(j).getPosition().toString();
             }
         }
         return rep;
     }
 
-    public void makeMove (String[] move) {
+    public void makeMove (Position[] move) {
         if (move == null) {
             System.out.println("Invalid move!");
             return;
         }
-        int[] start = positionToInts(move[0]);
-        int[] end = positionToInts(move[1]);
-        Piece startPiece = board[start[0]][start[1]];
-        Piece endPiece = board[end[0]][end[1]];
-        board[end[0]][end[1]] = startPiece;
-        startPiece.setPosition(positionToString(end));
+        Position start = move[0];
+        Position end = move[1];
+        Piece startPiece = board[start.getX()][start.getY()];
+        Piece endPiece = board[end.getX()][end.getY()];
+        board[end.getX()][end.getY()] = startPiece;
+        startPiece.setPosition(end);
         startPiece.setHasMoved(false);
-        board[start[0]][start[1]] = null;
+        board[start.getX()][start.getY()] = null;
         if (endPiece != null) {
             List<Piece> pieceList = (endPiece.getIsWhite() ? whitePieces : blackPieces).get(endPiece.getId());
             pieceList.remove(endPiece);
             System.out.println("Removing piece!");
         }
         whiteToMove = !whiteToMove;
-    }
-
-    public static int[] positionToInts(String position) {
-        if (position.length() != 2) {
-            //throw exception;
-            return new int[]{-1, -1};
-        }
-        int row = Character.getNumericValue(position.charAt(0)) - 10;
-        int col = Character.getNumericValue(position.charAt(1)) - 1;
-        return new int[]{row, col};
-    }
-
-    public static String positionToString(int[] position) {
-        if (position.length != 2) {
-            //throw exception;
-            return "";
-        }
-        char row = (char) (position[0] + 97);
-        char col = (char) (position[1] + 49);
-        return String.copyValueOf(new char[] {row, col});
     }
 
     public void printBoard () {
@@ -218,9 +196,9 @@ public class Chessboard {
         }
     }
 
-    public Piece[][] getBoard() {
+    /** public Piece[][] getBoard() {
         return this.board;
-    }
+    } **/
 
     public boolean isWhiteToMove() {
         return this.whiteToMove;

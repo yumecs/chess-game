@@ -5,7 +5,7 @@ import java.util.List;
 public abstract class Piece {
     private int id;
     private boolean isWhite;
-    private String position;
+    private Position position;
     private boolean hasMoved;
 
     public static final int PAWN = 0;
@@ -39,7 +39,7 @@ public abstract class Piece {
         return fromInt(idFromChar(c), color, pos);
     } **/
 
-    public static Piece fromInt(int id, boolean isWhite, String position) {
+    public static Piece fromInt(int id, boolean isWhite, Position position) {
         switch (id) {
             case PAWN:
                 return new Pawn(isWhite, position);
@@ -83,11 +83,11 @@ public abstract class Piece {
         this.isWhite = isWhite;
     }
 
-    protected String getPosition() {
+    protected Position getPosition() {
         return this.position;
     }
 
-    protected void setPosition(String position) {
+    protected void setPosition(Position position) {
         this.position = position;
     }
 
@@ -105,8 +105,8 @@ public abstract class Piece {
 
     public abstract char toChar();
 
-    protected abstract boolean isOnPath(String endPosition);
+    protected abstract boolean isOnPath(Position endPos);
 
-    protected abstract List<int[]> getCollisionInterval(String endPosition);
+    protected abstract List<Position> getCollisionInterval(Position endPos);
 
 }
