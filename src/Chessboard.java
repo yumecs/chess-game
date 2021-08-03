@@ -19,18 +19,18 @@ public class Chessboard {
     public static final int PLAYER_BLACK = 1;
 
     public static final String[][] INIT_BOARD = {
-        {"a2","b2","c2","d2","e2","f2","g2","h2"},
-        {"b1","g1"},
-        {"c1","f1"},
-        {"a1","h1"},
-        {"d1"},
-        {"e1"},
-        {"a7","b7","c7","d7","e7","f7","g7","h7"},
-        {"b8","g8"},
-        {"c8","f8"},
-        {"a8","h8"},
-        {"d8"},
-        {"e8"},
+            {"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"},
+            {"b1", "g1"},
+            {"c1", "f1"},
+            {"a1", "h1"},
+            {"d1"},
+            {"e1"},
+            {"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"},
+            {"b8", "g8"},
+            {"c8", "f8"},
+            {"a8", "h8"},
+            {"d8"},
+            {"e8"},
     };
 
     // Initialize a new chessboard.
@@ -52,7 +52,7 @@ public class Chessboard {
             for (int j = 0; j < state[i].length; j++) {
                 Position newPos = new Position(state[i][j]);
                 Piece newPiece = Piece.fromInt(i % PIECE_TYPES, i < PIECE_TYPES, newPos);
-                board[newPos.getX()][newPos.getY()] = newPiece;
+                board[newPos.first()][newPos.second()] = newPiece;
                 pieceList.add(newPiece);
             }
         }
@@ -63,10 +63,11 @@ public class Chessboard {
         this(INIT_BOARD, true);
     }
 
-    public Position[] parseMove (String note) {
-        note = note.replaceAll("\\s","");
-        note = note.replaceAll("x","");
+    public Position[] parseMove(String note) {
+        note = note.replaceAll("\\s", "");
+        note = note.replaceAll("x", "");
         // TODO: throw exceptions based on length
+        // TODO: better parse checker (exd5), info from rank or file
         char c = note.charAt(0);
         int id = Character.isUpperCase(c) ? Piece.idFromChar(c) : Piece.PAWN;
         int inc = id == 0 ? 0 : 1;
@@ -74,12 +75,11 @@ public class Chessboard {
         if (note.length() > 3) {
             start = new Position(note.substring(inc, inc + 2));
             end = new Position(note.substring(inc + 2, inc + 4));
-        }
-        else {
+        } else {
             end = new Position(note.substring(inc, inc + 2));
             start = this.inferStart(id, end);
         }
-        return start.getX() == -1 ? null : new Position[]{start, end};
+        return start.first() == -1 ? null : new Position[]{start, end};
     }
 
     public Position inferStart(int id, Position end) {
@@ -105,7 +105,7 @@ public class Chessboard {
 
     public boolean inCheck() {
         List<List<Piece>> self = whiteToMove ? blackPieces : whitePieces;
-        List<List<Piece>> opponent =  whiteToMove ? whitePieces : blackPieces;
+        List<List<Piece>> opponent = whiteToMove ? whitePieces : blackPieces;
         Position kingPos = self.get(Piece.KING).get(0).getPosition();
         // TODO: check pawn takes separately
         for (List<Piece> pList : opponent) {
@@ -118,18 +118,17 @@ public class Chessboard {
 
     public boolean connectsTo(Piece test, Position endPos) {
         Position startPos = test.getPosition();
-        Piece dest = board[endPos.getX()][endPos.getY()];
+        Piece dest = board[endPos.first()][endPos.second()];
 
         if (dest != null) {
             if (dest.getIsWhite() == test.getIsWhite()) {
                 // A piece cannot move to a friendly piece.
                 return false;
-            }
-            else if (test.getId() == Piece.PAWN) {
+            } else if (test.getId() == Piece.PAWN) {
                 // Pawn takes are implemented separately.
                 // TODO: implement en passant
                 int sign = test.getIsWhite() ? 1 : -1;
-                return endPos.getY() == startPos.getY() + sign && Math.abs(endPos.getX() - startPos.getX()) == 1;
+                return endPos.second() == startPos.second() + sign && Math.abs(endPos.first() - startPos.first()) == 1;
             }
         }
 
@@ -141,7 +140,7 @@ public class Chessboard {
 
         List<Position> collision = test.getCollisionInterval(endPos);
         for (Position c : collision) {
-            if (board[c.getX()][c.getY()] != null) {
+            if (board[c.first()][c.second()] != null) {
                 return false;
             }
         }
@@ -161,32 +160,33 @@ public class Chessboard {
         return rep;
     }
 
-    public void makeMove (Position[] move) {
+    public void makeMove(Position[] move) {
+        System.out.println("Making move");
         if (move == null) {
             System.out.println("Invalid move!");
             return;
         }
         Position start = move[0];
         Position end = move[1];
-        Piece startPiece = board[start.getX()][start.getY()];
-        Piece endPiece = board[end.getX()][end.getY()];
-        board[end.getX()][end.getY()] = startPiece;
+        Piece startPiece = board[start.first()][start.second()];
+        Piece endPiece = board[end.first()][end.second()];
+        board[end.first()][end.second()] = startPiece;
         startPiece.setPosition(end);
         startPiece.setHasMoved(false);
-        board[start.getX()][start.getY()] = null;
+        board[start.first()][start.second()] = null;
         if (endPiece != null) {
             List<Piece> pieceList = (endPiece.getIsWhite() ? whitePieces : blackPieces).get(endPiece.getId());
+            System.out.println("Removing piece: " + endPiece);
             pieceList.remove(endPiece);
-            System.out.println("Removing piece!");
         }
         whiteToMove = !whiteToMove;
     }
 
-    public void printBoard () {
-       Chessboard.printBoard(board);
+    public void printBoard() {
+        Chessboard.printBoard(board);
     }
 
-    public static void printBoard (Piece[][] board) {
+    public static void printBoard(Piece[][] board) {
         for (int i = BOARD_SIDE - 1; i >= 0; i--) {
             for (int j = 0; j < BOARD_SIDE; j++) {
                 Piece p = board[j][i];
@@ -196,9 +196,11 @@ public class Chessboard {
         }
     }
 
-    /** public Piece[][] getBoard() {
-        return this.board;
-    } **/
+    /**
+     * public Piece[][] getBoard() {
+     * return this.board;
+     * }
+     **/
 
     public boolean isWhiteToMove() {
         return this.whiteToMove;

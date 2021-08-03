@@ -1,6 +1,6 @@
 import java.util.List;
 import java.util.function.Function;
-import functional.basic.Util;
+import common.functional.Util;
 
 public class Rook extends Piece {
     public Rook(boolean isWhite, Position newPosition) {
@@ -24,17 +24,17 @@ public class Rook extends Piece {
 
     public boolean isOnPath(Position endPos) {
         Position startPos = this.getPosition();
-        return startPos.getX() == endPos.getX() || startPos.getY() == endPos.getY();
+        return startPos.first() == endPos.first() || startPos.second() == endPos.second();
     }
 
     public List<Position> getCollisionInterval(Position endPos) {
         Position startPos = this.getPosition();
-        boolean vertical = startPos.getX() == endPos.getX();
-        int startDifferent = vertical ? startPos.getY() : startPos.getX();
-        int endDifferent = vertical ? endPos.getY() : startPos.getX();
+        boolean vertical = startPos.first() == endPos.first();
+        int startDifferent = vertical ? startPos.second() : startPos.first();
+        int endDifferent = vertical ? endPos.second() : startPos.first();
         Function<Integer, Position> fn = (i) -> vertical
-                ? new Position(startPos.getX(), i)
-                : new Position(i, startPos.getY());
+                ? new Position(startPos.first(), i)
+                : new Position(i, startPos.second());
         return Util.map(Util.interval(startDifferent,endDifferent), fn);
     }
 }

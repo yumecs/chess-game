@@ -25,15 +25,15 @@ public class Pawn extends Piece {
     public boolean isOnPath(Position endPos) {
         Position startPos = this.getPosition();
         int sign = this.getIsWhite() ? 1 : -1;
-        return endPos.getX() == startPos.getX()
-                && (endPos.getY() == startPos.getY() + sign || endPos.getY() == startPos.getY() + 2 * sign);
+        return endPos.first() == startPos.first()
+                && (endPos.second() == startPos.second() + sign || endPos.second() == startPos.second() + 2 * sign);
     }
 
     public List<Position> getCollisionInterval(Position endPos) {
         Position startPos = this.getPosition();
         int sign = this.getIsWhite() ? 1 : -1;
-        return this.isOnPath(endPos) && (endPos.getY() > startPos.getY() + sign)
-                ? Collections.singletonList(new Position(startPos.getX(), startPos.getY() + sign))
+        return this.isOnPath(endPos) && (endPos.second() > startPos.second() + sign)
+                ? Collections.singletonList(new Position(startPos.first(), startPos.second() + sign))
                 : new ArrayList<>();
     }
 }

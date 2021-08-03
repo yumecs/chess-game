@@ -23,8 +23,8 @@ public class Knight extends Piece {
 
     public boolean isOnPath(Position endPos) {
         Position startPos = this.getPosition();
-        int xDiff = Math.abs(startPos.getX() - endPos.getX());
-        int yDiff = Math.abs(startPos.getY() - endPos.getY());
+        int xDiff = Math.abs(startPos.first() - endPos.first());
+        int yDiff = Math.abs(startPos.second() - endPos.second());
         return xDiff * yDiff == 2;
     }
 
