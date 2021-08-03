@@ -1,0 +1,12 @@
+common/functional/Tuple.class
+Main.class
+Queen.class
+Bishop.class
+Position.class
+Chessboard.class
+Rook.class
+common/functional/Util.class
+King.class
+Pawn.class
+Piece.class
+Knight.class

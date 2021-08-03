@@ -35,9 +35,11 @@ public abstract class Piece {
         }
     }
 
-    /** public static Piece fromChar(char c, boolean color, String pos) {
-        return fromInt(idFromChar(c), color, pos);
-    } **/
+    /**
+     * public static Piece fromChar(char c, boolean color, String pos) {
+     * return fromInt(idFromChar(c), color, pos);
+     * }
+     **/
 
     public static Piece fromInt(int id, boolean isWhite, Position position) {
         switch (id) {
@@ -59,14 +61,15 @@ public abstract class Piece {
         }
     }
 
-    /** public static boolean inBound(int x, int y) {
-        return (x >= 0 && x < 8 && y >= 0 && y < 8);
-    } **/
+    /**
+     * public static boolean inBound(int x, int y) {
+     * return (x >= 0 && x < 8 && y >= 0 && y < 8);
+     * }
+     **/
 
     // TODO: implement public static boolean isOnPath
 
     // TODO: Chessboard calls onPath instead, returns null if not on path.
-
     protected int getId() {
         return this.id;
     }

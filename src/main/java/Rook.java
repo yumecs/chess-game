@@ -1,6 +1,7 @@
+import common.functional.Util;
+
 import java.util.List;
 import java.util.function.Function;
-import common.functional.Util;
 
 public class Rook extends Piece {
     public Rook(boolean isWhite, Position newPosition) {
@@ -35,6 +36,6 @@ public class Rook extends Piece {
         Function<Integer, Position> fn = (i) -> vertical
                 ? new Position(startPos.first(), i)
                 : new Position(i, startPos.second());
-        return Util.map(Util.interval(startDifferent,endDifferent), fn);
+        return Util.map(Util.interval(startDifferent, endDifferent), fn);
     }
 }

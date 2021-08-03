@@ -1,7 +1,7 @@
+import common.functional.Util;
+
 import java.util.List;
 import java.util.function.Function;
-
-import common.functional.Util;
 
 public class Bishop extends Piece {
     public Bishop(boolean isWhite, Position newPosition) {
