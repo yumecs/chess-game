@@ -1,12 +1,12 @@
-common/functional/Tuple.class
-Main.class
+common\functional\Util.class
 Queen.class
 Bishop.class
+Pawn.class
+Main.class
 Position.class
 Chessboard.class
+common\functional\Tuple.class
 Rook.class
-common/functional/Util.class
 King.class
-Pawn.class
 Piece.class
 Knight.class
