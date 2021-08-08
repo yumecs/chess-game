@@ -1,19 +1,19 @@
 package common.functional;
 
-public class Tuple {
-    private final int first;
-    private final int second;
+public class Tuple<T> {
+    private final T first;
+    private final T second;
 
-    public Tuple(int first, int second) {
+    public Tuple(T first, T second) {
         this.first = first;
         this.second = second;
     }
 
-    public int first() {
+    public T first() {
         return this.first;
     }
 
-    public int second() {
+    public T second() {
         return this.second;
     }
 }

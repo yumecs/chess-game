@@ -1,6 +1,7 @@
-// TODO: implement Position
 // TODO: implement Promotion
 // TODO: implement Checkmate
+
+import common.functional.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class Chessboard {
         this(INIT_BOARD, true);
     }
 
-    public Position[] parseMove(String note) {
+    public Tuple<Position> parseMove(String note) {
         note = note.replaceAll("\\s", "");
         note = note.replaceAll("x", "");
         // TODO: throw exceptions based on length
@@ -79,7 +80,7 @@ public class Chessboard {
             end = new Position(note.substring(inc, inc + 2));
             start = this.inferStart(id, end);
         }
-        return start.first() == -1 ? null : new Position[]{start, end};
+        return start == null ? null : new Tuple<>(start, end);
     }
 
     public Position inferStart(int id, Position end) {
@@ -87,9 +88,7 @@ public class Chessboard {
         for (Piece test : pieceList) {
             if (legalMoveTo(test, end)) return test.getPosition();
         }
-        // TODO: throw exception if empty string
-        System.out.println("Exception: start not found.");
-        return new Position(-1, -1);
+        return null;
     }
 
     public boolean legalMoveTo(Piece test, Position end) {
@@ -97,7 +96,7 @@ public class Chessboard {
         if (connectsTo(test, end)) {
             // Verify if the next move will result in a checkmate.
             Chessboard nextBoard = new Chessboard(this.getRep(), this.whiteToMove);
-            nextBoard.makeMove(new Position[]{test.getPosition(), end});
+            nextBoard.makeMove(new Tuple<>(test.getPosition(), end));
             return !nextBoard.inCheck();
         }
         return false;
@@ -160,23 +159,25 @@ public class Chessboard {
         return rep;
     }
 
-    public void makeMove(Position[] move) {
-        System.out.println("Making move");
+    public void makeMove(Tuple<Position> move) {
         if (move == null) {
-            System.out.println("Invalid move!");
+            System.out.println("Illegal move!");
             return;
         }
-        Position start = move[0];
-        Position end = move[1];
-        Piece startPiece = board[start.first()][start.second()];
-        Piece endPiece = board[end.first()][end.second()];
+
+        Position start = move.first(), end = move.second();
+        Piece startPiece = board[start.first()][start.second()], endPiece = board[end.first()][end.second()];
+
+        // Move the piece.
         board[end.first()][end.second()] = startPiece;
         startPiece.setPosition(end);
-        startPiece.setHasMoved(false);
+        startPiece.setHasMoved(true);
         board[start.first()][start.second()] = null;
+
+        // If the piece takes, remove the taken piece.
         if (endPiece != null) {
-            List<Piece> pieceList = (endPiece.getIsWhite() ? whitePieces : blackPieces).get(endPiece.getId());
-            System.out.println("Removing piece: " + endPiece);
+            List<Piece> pieceList = (endPiece.getIsWhite() ? whitePieces : blackPieces)
+                    .get(endPiece.getId());
             pieceList.remove(endPiece);
         }
         whiteToMove = !whiteToMove;
