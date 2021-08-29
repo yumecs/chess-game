@@ -1,5 +1,6 @@
 // TODO: implement Promotion
 // TODO: implement Checkmate
+// TODO: separate Chess Board and Chess Game
 
 import common.functional.Tuple;
 
@@ -15,6 +16,7 @@ public class Chessboard {
 
     public static final int PIECE_TYPES = 6;
     public static final int BOARD_SIDE = 8;
+
     public static final int PLAYER_NONE = -1;
     public static final int PLAYER_WHITE = 0;
     public static final int PLAYER_BLACK = 1;
@@ -133,9 +135,7 @@ public class Chessboard {
 
         // TODO: implement castling
 
-        if (!test.isOnPath(endPos)) {
-            return false;
-        }
+        if (!test.isOnPath(endPos)) return false;
 
         List<Position> collision = test.getCollisionInterval(endPos);
         for (Position c : collision) {
